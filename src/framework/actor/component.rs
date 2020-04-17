@@ -7,6 +7,8 @@ use raylib::prelude::*;
 use super::context::ActorComponentContext;
 
 
+pub type ComponentVec<T> = Vec<Box<dyn ActorComponent<T>>>;
+
 
 /// Component of an actor.
 ///

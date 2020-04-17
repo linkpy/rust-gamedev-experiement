@@ -1,4 +1,5 @@
 
 pub mod actor;
-pub mod bare_scene;
+pub mod scene;
+
 pub mod prelude;

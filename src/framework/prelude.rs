@@ -1,3 +1,3 @@
 
-pub use super::bare_scene::*;
 pub use super::actor::*;
+pub use super::scene::*;

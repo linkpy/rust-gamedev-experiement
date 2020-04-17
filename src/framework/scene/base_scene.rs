@@ -1,5 +1,5 @@
 
-#[deny(missing_docs)]
+#![deny(missing_docs)]
 
 
 use raylib::prelude::*;
@@ -8,7 +8,7 @@ use failure::Error;
 
 /// Represents a scene in the game.
 ///
-pub trait BareScene {
+pub trait BaseScene {
     /// Initializes the scene.
     ///
     fn initialize(&mut self) -> Option<Error>;

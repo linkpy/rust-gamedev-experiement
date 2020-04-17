@@ -6,10 +6,10 @@ use failure::Error;
 
 use framework::prelude::*;
 
+
 struct TestScene;
 
-
-impl BareScene for TestScene {
+impl BaseScene for TestScene {
 	fn initialize(&mut self) -> Option<Error> {
 		None
 	}

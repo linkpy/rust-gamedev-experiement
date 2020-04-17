@@ -30,8 +30,8 @@ impl<T> ActorHolder<T> {
     pub fn with_capacity(data: T, cap: usize) -> ActorHolder<T> {
         ActorHolder {
             data: data,
-            components: Vec::with_capacity(cap),
             controls: ActorControls::new(),
+            components: Vec::with_capacity(cap),
         }
     }
 
