@@ -10,19 +10,19 @@ use super::context::ActorComponentContext;
 
 /// Component of an actor.
 ///
-pub trait ActorComponent {
+pub trait ActorComponent<T> {
     /// Initializes the component.
     ///
-    fn initialize(&mut self, ctx: ActorComponentContext) -> Option<Error>;
+    fn initialize(&mut self, ctx: ActorComponentContext<T>) -> Option<Error>;
     /// Loads the component.
     ///
-    fn load(&mut self, ctx: ActorComponentContext, rl: &mut RaylibHandle) -> Option<Error>;
+    fn load(&mut self, ctx: ActorComponentContext<T>, rl: &mut RaylibHandle) -> Option<Error>;
 
 
     /// Updates the component.
     ///
-    fn update(&mut self, ctx: ActorComponentContext, dt: f32, rl: &mut RaylibHandle) -> Option<Error>;
+    fn update(&mut self, ctx: ActorComponentContext<T>, dt: f32, rl: &mut RaylibHandle) -> Option<Error>;
     /// Draws the component.
     ///
-    fn draw(&mut self, ctx: ActorComponentContext, rl: &mut RaylibHandle);
+    fn draw(&mut self, ctx: ActorComponentContext<T>, rl: &mut RaylibHandle);
 }

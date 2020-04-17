@@ -4,31 +4,34 @@
 use failure::Error;
 use raylib::prelude::*;
 
-use super::actor::Actor;
+use super::controls::ActorControls;
 use super::component::ActorComponent;
 use super::context::ActorComponentContext;
 
 
 
 /// Struct holding an actor and its component.
-pub struct ActorHolder {
-    pub actor: Actor,
-    components: Vec<Box<dyn ActorComponent>>
+pub struct ActorHolder<T> {
+    pub data: T,
+
+    controls: ActorControls<T>,
+    components: Vec<Box<dyn ActorComponent<T>>>
 }
 
 
-impl ActorHolder {
+impl<T> ActorHolder<T> {
     /// Creates a new holder.
     ///
-    pub fn new() -> ActorHolder {
-        ActorHolder::with_capacity(0)
+    pub fn new(data: T) -> ActorHolder<T> {
+        ActorHolder::with_capacity(data, 0)
     }
     /// Creates a new holder with `cap` preallocated components.
     ///
-    pub fn with_capacity(cap: usize) -> ActorHolder {
+    pub fn with_capacity(data: T, cap: usize) -> ActorHolder<T> {
         ActorHolder {
-            actor: Actor::new(),
+            data: data,
             components: Vec::with_capacity(cap),
+            controls: ActorControls::new(),
         }
     }
 
@@ -36,8 +39,13 @@ impl ActorHolder {
 
     /// Adds a new component to the actor.
     ///
-    pub fn add_component(&mut self, ac: impl ActorComponent + 'static) {
+    pub fn add_component(&mut self, ac: impl ActorComponent<T> + 'static) {
         self.components.push(Box::new(ac));
+    }
+    /// Removes the component at the given index.
+    ///
+    pub fn remove_component(&mut self, idx: usize) {
+        self.components.remove(idx);
     }
 
 
@@ -46,7 +54,7 @@ impl ActorHolder {
     ///
     pub fn initialize(&mut self) -> Option<Error> {
         for (idx, c) in self.components.iter_mut().enumerate() {
-            let ctx = ActorComponentContext::new(&mut self.actor, idx);
+            let ctx = ActorComponentContext::new(&mut self.data, &mut self.controls, idx);
             if let Some(err) = c.initialize(ctx) {
                 return Some(err);
             }
@@ -58,7 +66,7 @@ impl ActorHolder {
     ///
     pub fn load(&mut self, rl: &mut RaylibHandle) -> Option<Error> {
         for (idx, c) in self.components.iter_mut().enumerate() {
-            let ctx = ActorComponentContext::new(&mut self.actor, idx);
+            let ctx = ActorComponentContext::new(&mut self.data, &mut self.controls, idx);
             if let Some(err) = c.load(ctx, rl) {
                 return Some(err);
             }
@@ -70,7 +78,7 @@ impl ActorHolder {
     ///
     pub fn update(&mut self, dt: f32, rl: &mut RaylibHandle) -> Option<Error> {
         for (idx, c) in self.components.iter_mut().enumerate() {
-            let ctx = ActorComponentContext::new(&mut self.actor, idx);
+            let ctx = ActorComponentContext::new(&mut self.data, &mut self.controls, idx);
             if let Some(err) = c.update(ctx, dt, rl) {
                 return Some(err);
             }
@@ -82,7 +90,7 @@ impl ActorHolder {
     ///
     pub fn draw(&mut self, rl: &mut RaylibHandle) {
         for (idx, c) in self.components.iter_mut().enumerate() {
-            let ctx = ActorComponentContext::new(&mut self.actor, idx);
+            let ctx = ActorComponentContext::new(&mut self.data, &mut self.controls, idx);
             c.draw(ctx, rl);
         }
     }
@@ -92,11 +100,11 @@ impl ActorHolder {
     /// Makes the actor's controls to take effect.
     ///
     pub fn execute_controls(&mut self) {
-        for (cnt, idx) in self.actor.controls.get_removed_components().enumerate() {
+        for (cnt, idx) in self.controls.get_queued_component_removals().enumerate() {
             self.components.remove(idx - cnt);
         }
 
-        for ac in self.actor.controls.get_added_components() {
+        for ac in self.controls.get_queued_components() {
             self.components.push(ac);
         }
 

@@ -10,9 +10,9 @@ use super::component::ActorComponent;
 
 /// Object controlling the overal actor.
 ///
-pub struct ActorControls {
+pub struct ActorControls<T> {
     /// List of component to add to the actor.
-    components_to_add: Vec<Box<dyn ActorComponent>>,
+    components_to_add: Vec<Box<dyn ActorComponent<T>>>,
     /// List of component indexes to remove from the actor.
     components_to_remove: Vec<usize>,
 
@@ -20,11 +20,11 @@ pub struct ActorControls {
     queued_for_deletion: bool,
 }
 
-impl ActorControls {
+impl<T> ActorControls<T> {
 
     /// Creates a new instance.
     ///
-    pub fn new() -> ActorControls {
+    pub fn new() -> ActorControls<T> {
         ActorControls {
             components_to_add: Vec::new(),
             components_to_remove: Vec::new(),
@@ -36,24 +36,24 @@ impl ActorControls {
 
     /// Queues the addition of the given component to the actor.
     ///
-    pub fn add_component(&mut self, ac: impl ActorComponent + 'static) {
+    pub fn queue_component(&mut self, ac: impl ActorComponent<T> + 'static) {
         self.components_to_add.push(Box::new(ac));
     }
     /// Queues the deletion of the given component from the actor.
     ///
-    pub fn remove_component(&mut self, idx: usize) {
+    pub fn queue_component_removal(&mut self, idx: usize) {
         self.components_to_remove.push(idx);
     }
 
 
     /// Gets the components queued for addition to the actor.
     ///
-    pub fn get_added_components(&mut self) -> Drain<Box<dyn ActorComponent>> {
+    pub fn get_queued_components(&mut self) -> Drain<Box<dyn ActorComponent<T>>> {
         self.components_to_add.drain(..)
     }
     /// Gets the components queued for removal from the actor.
     ///
-    pub fn get_removed_components(&mut self) -> Drain<usize> {
+    pub fn get_queued_component_removals(&mut self) -> Drain<usize> {
         self.components_to_remove.sort_unstable();
         self.components_to_remove.dedup();
         self.components_to_remove.drain(..)
