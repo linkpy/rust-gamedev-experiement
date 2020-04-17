@@ -1,5 +1,5 @@
 
-#[deny(missing_docs)]
+#![deny(missing_docs)]
 
 use raylib::prelude::*;
 
@@ -12,14 +12,14 @@ use super::component::ActorComponent;
 /// Actor's properties.
 pub struct Actor {
     /// Controls.
-    controls: ActorControls,
+    pub controls: ActorControls,
 
     /// Position
-    position: Vector2,
+    pub position: Vector2,
     /// Rotation
-    rotation: f32,
+    pub rotation: f32,
     /// Scale
-    scaling: Vector2,
+    pub scaling: Vector2,
 }
 
 impl Actor {

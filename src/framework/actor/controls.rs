@@ -1,6 +1,8 @@
 
 
-#[deny(missing_docs)]
+#![deny(missing_docs)]
+
+use std::vec::Drain;
 
 use super::component::ActorComponent;
 
@@ -41,6 +43,20 @@ impl ActorControls {
     ///
     pub fn remove_component(&mut self, idx: usize) {
         self.components_to_remove.push(idx);
+    }
+
+
+    /// Gets the components queued for addition to the actor.
+    ///
+    pub fn get_added_components(&mut self) -> Drain<Box<dyn ActorComponent>> {
+        self.components_to_add.drain(..)
+    }
+    /// Gets the components queued for removal from the actor.
+    ///
+    pub fn get_removed_components(&mut self) -> Drain<usize> {
+        self.components_to_remove.sort_unstable();
+        self.components_to_remove.dedup();
+        self.components_to_remove.drain(..)
     }
 
 

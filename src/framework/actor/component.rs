@@ -1,5 +1,5 @@
 
-#[deny(missing_docs)]
+#![deny(missing_docs)]
 
 use failure::Error;
 use raylib::prelude::*;

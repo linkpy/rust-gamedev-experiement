@@ -1,5 +1,5 @@
 
-#[deny(missing_docs)]
+#![deny(missing_docs)]
 
 use failure::Error;
 use raylib::prelude::*;
@@ -12,7 +12,7 @@ use super::context::ActorComponentContext;
 
 /// Struct holding an actor and its component.
 pub struct ActorHolder {
-    actor: Actor,
+    pub actor: Actor,
     components: Vec<Box<dyn ActorComponent>>
 }
 
@@ -57,7 +57,7 @@ impl ActorHolder {
     /// Loads the actor's components.
     ///
     pub fn load(&mut self, rl: &mut RaylibHandle) -> Option<Error> {
-        for (idx, c) in &mut self.components.iter_mut().enumerate() {
+        for (idx, c) in self.components.iter_mut().enumerate() {
             let ctx = ActorComponentContext::new(&mut self.actor, idx);
             if let Some(err) = c.load(ctx, rl) {
                 return Some(err);
@@ -69,7 +69,7 @@ impl ActorHolder {
     /// Updates the actor's components.
     ///
     pub fn update(&mut self, dt: f32, rl: &mut RaylibHandle) -> Option<Error> {
-        for (idx, c) in &mut self.components.iter_mut().enumerate() {
+        for (idx, c) in self.components.iter_mut().enumerate() {
             let ctx = ActorComponentContext::new(&mut self.actor, idx);
             if let Some(err) = c.update(ctx, dt, rl) {
                 return Some(err);
@@ -81,10 +81,26 @@ impl ActorHolder {
     /// Draws the actor's components.
     ///
     pub fn draw(&mut self, rl: &mut RaylibHandle) {
-        for (idx, c) in &mut self.components.iter_mut().enumerate() {
+        for (idx, c) in self.components.iter_mut().enumerate() {
             let ctx = ActorComponentContext::new(&mut self.actor, idx);
             c.draw(ctx, rl);
         }
+    }
+
+
+
+    /// Makes the actor's controls to take effect.
+    ///
+    pub fn execute_controls(&mut self) {
+        for (cnt, idx) in self.actor.controls.get_removed_components().enumerate() {
+            self.components.remove(idx - cnt);
+        }
+
+        for ac in self.actor.controls.get_added_components() {
+            self.components.push(ac);
+        }
+
+        // TODO: support queued_for_deletion.
     }
 
 }

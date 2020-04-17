@@ -1,5 +1,5 @@
 
-#[deny(missing_docs)]
+#![deny(missing_docs)]
 
 use super::actor::Actor;
 
